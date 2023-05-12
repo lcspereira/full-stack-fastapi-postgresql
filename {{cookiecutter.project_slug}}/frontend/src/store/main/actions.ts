@@ -33,7 +33,7 @@ export const actions = {
             } else {
                 await dispatchLogOut(context);
             }
-        } catch (err) {
+        } catch (err: any) {
             commitSetLogInError(context, true);
             await dispatchLogOut(context);
         }
@@ -44,7 +44,7 @@ export const actions = {
             if (response.data) {
                 commitSetUserProfile(context, response.data);
             }
-        } catch (error) {
+        } catch (error: any) {
             await dispatchCheckApiError(context, error);
         }
     },
@@ -54,12 +54,12 @@ export const actions = {
             commitAddNotification(context, loadingNotification);
             const response = (await Promise.all([
                 api.updateMe(context.state.token, payload),
-                await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+                await new Promise<void>((resolve, reject) => setTimeout(() => resolve(), 500)),
             ]))[0];
             commitSetUserProfile(context, response.data);
             commitRemoveNotification(context, loadingNotification);
             commitAddNotification(context, { content: 'Profile successfully updated', color: 'success' });
-        } catch (error) {
+        } catch (error: any) {
             await dispatchCheckApiError(context, error);
         }
     },
@@ -115,7 +115,7 @@ export const actions = {
         }
     },
     async removeNotification(context: MainContext, payload: { notification: AppNotification, timeout: number }) {
-        return new Promise((resolve, reject) => {
+        return new Promise<boolean>((resolve, reject) => {
             setTimeout(() => {
                 commitRemoveNotification(context, payload.notification);
                 resolve(true);
@@ -128,12 +128,12 @@ export const actions = {
             commitAddNotification(context, loadingNotification);
             const response = (await Promise.all([
                 api.passwordRecovery(payload.username),
-                await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+                await new Promise<void>((resolve, reject) => setTimeout(() => resolve(), 500)),
             ]))[0];
             commitRemoveNotification(context, loadingNotification);
             commitAddNotification(context, { content: 'Password recovery email sent', color: 'success' });
             await dispatchLogOut(context);
-        } catch (error) {
+        } catch (error: any) {
             commitRemoveNotification(context, loadingNotification);
             commitAddNotification(context, { color: 'error', content: 'Incorrect username' });
         }
@@ -144,12 +144,12 @@ export const actions = {
             commitAddNotification(context, loadingNotification);
             const response = (await Promise.all([
                 api.resetPassword(payload.password, payload.token),
-                await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+                await new Promise<void>((resolve, reject) => setTimeout(() => resolve(), 500)),
             ]))[0];
             commitRemoveNotification(context, loadingNotification);
             commitAddNotification(context, { content: 'Password successfully reset', color: 'success' });
             await dispatchLogOut(context);
-        } catch (error) {
+        } catch (error: any) {
             commitRemoveNotification(context, loadingNotification);
             commitAddNotification(context, { color: 'error', content: 'Error resetting password' });
         }
